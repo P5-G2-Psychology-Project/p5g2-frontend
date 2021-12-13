@@ -28,7 +28,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                        <tr height="10px" v-for="entry in entriesDetailByUsername" :key="entry.id"  class="hideextra">
+                        <tr height="10px" v-for="entry in entriesDetailByUsername" :key="entry.id" v-on:click="selectRow(entry.id)" class="hideextra">
                             <td>{{entry.fecha}}</td>
                             <td>{{entry.psicologo}}</td>
                             <td>{{entry.asistencia}}</td>
@@ -42,7 +42,7 @@
                     </tbody>
                 </table>
             </div>
-            <input type="text" ref="row-selected">
+            <p v-if="rowSelected != 0">El id de la fila seleccionada es: {{this.rowSelected}} </p>
         </div>
         <br/>
         <br/>
@@ -115,9 +115,6 @@
 
 
 <script>
-var table = document.getElementById('tableLogbook')
-alert(table)
-
     import gql        from 'graphql-tag';
 
     export default{
@@ -143,7 +140,9 @@ alert(table)
                     attendance      : false,
                     description     : "",
                     satisfaction    : ""
-                },                
+                },   
+                
+                rowSelected : 0,
             }
             
         },
@@ -154,6 +153,13 @@ alert(table)
                 var top = element.offsetTop;
 
                  window.scrollTo(0, top);
+            },
+
+            selectRow(id){
+                this.rowSelected = id;
+                console.log(id)
+                alert(this.rowSelected)
+                document.getElementById('row-selected').value = this.rowSelected;
             },
 
             processCreateEntry: async function(){
