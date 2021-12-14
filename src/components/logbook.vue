@@ -4,12 +4,11 @@
            
             <div class="menu-logbook">
                 <ul>
-                    <li>
-                        
-                       <button> <a  @click="scrollMeTo('crearEntrada')">Añadir</a></button>
-                       <button> <a  @click="scrollMeTo('actualizarEntrada')">Actualizar</a></button>
-                        <button> Ver </button>
-                        <button> Eliminar </button> 
+                    <li>   
+                        <button> <a  @click="scrollMeTo('crearEntrada')">Añadir</a></button>
+                        <button> <a  @click="scrollMeTo('actualizarEntrada')">Actualizar</a></button>
+                        <button> <a @click="scrollMeTo('verEntrada')">Ver</a></button>
+                        <button v-on:click="processDeleteEntry()"> Eliminar </button> 
                     </li>
                 </ul>
             </div>
@@ -28,7 +27,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                        <tr height="10px" v-for="entry in entriesDetailByUsername" :key="entry.id" v-on:click="selectRow(entry.id)" class="hideextra">
+                        <tr height="10px" v-for="entry in entriesDetailByUsername" :key="entry" v-on:click="selectRow(entry)" class="hideextra">
                             <td>{{entry.fecha}}</td>
                             <td>{{entry.psicologo}}</td>
                             <td>{{entry.asistencia}}</td>
@@ -81,9 +80,10 @@
         
         <div class="logbook-container-3" ref="actualizarEntrada">
             
-             <div class="imageUpdateEntry">
-            <img src="../images/appointment2.jpg" width="500" height="450">
-        </div> 
+            <div class="imageUpdateEntry">
+                <img src="../images/appointment2.jpg" width="500" height="450">
+            </div> 
+
             <fieldset>
                 <legend>Actualizar entrada</legend>
                 <form class="formUpdateEntry" v-on:submit.prevent="processUpdateEntry">
@@ -96,15 +96,37 @@
                     <p>Asistencia</p>
                     <div class="create-radio-buttons">
                         <label for="1">Si</label>
-                        <input class="radio-1" type="radio" id="1" value="1" >
+                        <input class="radio-1" type="radio" id="1" value="1" v-model="updateTicket.attendance">
                         <label for="2">No</label>
-                        <input class="radio-1" type="radio" id="0" value="0" >
+                        <input class="radio-1" type="radio" id="0" value="0" v-model="updateTicket.attendance">
                     </div>
                     <input type="number" v-model="updateTicket.satisfaction" placeholder="Satisfacción">
                     <br/>
-                    <button type="submit">Crear</button>
+                    <button type="submit">Actualizar</button>
                 </form>
             </fieldset>
+        </div>
+        <br/>
+        <br/>
+
+        <div class="logbook-container-4" ref="verEntrada">
+            <div class="middle-container-4">
+                <div class="viewEntry">
+                    <h3 >Profesional: {{}}   </h3>
+                    <h3>Fecha:        {{}}   </h3>
+                    <h3>Asistencia:   {{}}   </h3>
+                    <h3>Satisfaccion: {{}}   </h3>
+                    <h3>Descripción:  {{}}   </h3>
+                </div> 
+                <div class="viewEntryAnswer">
+                    <h3>{{this.detailTicket.psicologo}}</h3>
+                    <h3>{{this.detailTicket.fecha}}</h3>
+                    <h3>{{this.detailTicket.asistencia}}</h3>
+                    <h3>{{this.detailTicket.satisfaccion}}</h3>
+                    <h3>{{this.detailTicket.descripcion}}</h3>
+                    
+                </div>
+            </div>            
         </div>
 
 <div class="footer">
@@ -112,7 +134,6 @@
     </div>
     </div>
 </template>
-
 
 <script>
     import gql        from 'graphql-tag';
@@ -131,6 +152,8 @@
                     description     : "",
                     satisfaction    : ""
                 },
+                
+                rowSelected : 0,
 
                 updateTicket            : {
                     id              : this.rowSelected,
@@ -140,9 +163,16 @@
                     attendance      : false,
                     description     : "",
                     satisfaction    : ""
-                },   
+                },  
                 
-                rowSelected : 0,
+                detailTicket              : {
+                    psicologo       : "",
+                    fecha           : "",
+                    asistencia      : undefined,
+                    descripcion     : "",
+                    satisfaccion    : undefined         
+                },
+                
             }
             
         },
@@ -151,13 +181,17 @@
             scrollMeTo(refName) {
                 var element = this.$refs[refName];
                 var top = element.offsetTop;
-
                  window.scrollTo(0, top);
             },
 
-            selectRow(id){
-                this.rowSelected = id;
-                console.log(id)
+            selectRow(entryRow){
+                this.rowSelected = entryRow.id;
+
+                this.detailTicket.psicologo     = entryRow.psicologo;
+                this.detailTicket.fecha         = entryRow.fecha;
+                this.detailTicket.asistencia    = entryRow.asistencia;
+                this.detailTicket.descripcion   = entryRow.descripcion;
+                this.detailTicket.satisfaccion  = entryRow.satisfaccion;
                 alert(this.rowSelected)
             },
 
@@ -221,7 +255,11 @@
             },
 
             processUpdateEntry: async function(){
-                this.entryTicket.attendance = !!parseInt(this.entryTicket.attendance);
+                this.updateTicket.attendance = !!parseInt(this.updateTicket.attendance);
+                console.log(this.updateTicket);
+                console.log("Estoy actualizando la entrada" + this.rowSelected)
+                this.updateTicket.id = this.rowSelected;
+                
                 if(this.rowSelected != 0)
                 {
                     if(localStorage.getItem("tokenRefresh") === null || localStorage.getItem('tokenAccess') === null){
@@ -278,8 +316,10 @@
                     .then((result) => {
                         let message = "La entrada ha sido actualizada exitosamente";
                         alert(message);
+                        this.$emit("completedLogbook")
                     })
                     .catch((error) => {
+                        console.log(this.updateTicket)
                         console.log(error)
                         alert("Ha ocurrido un error actualizando la entrada")
                     })
@@ -287,6 +327,30 @@
                 else{
                     alert("Debe seleccionar alguna entrada");
                 }
+            },
+
+            processDeleteEntry: async function(){
+                await this.$apollo.mutate(
+                    {
+                        mutation: gql`
+                            mutation EntryDelete($entryId: Int!) {
+                              entryDelete(entryId: $entryId)
+                            }
+                        `,
+                        variables : {
+                            entryId: this.rowSelected,
+                        }
+                    }
+                )
+                .then((result) => {
+                    console.log(result)
+                    let message = "La entrada ha sido eliminada exitosamente";
+                    alert(message);
+                })
+                .catch((error) => {
+                    console.log(error)
+                    alert("Ha ocurrido un error eliminando la entrada")
+                })                
             }
 
         },
@@ -321,6 +385,9 @@
 </script>
 
 <style>
+    .Logbook{
+        display:block;
+    }
     .logbook-container-1{
         position: relative;
         height: 400px;
@@ -357,9 +424,19 @@
         width: 80%;
         height : 600px;
         align-self: center;
-        left: 100px;
-        
+        left: 100px;   
     }
+
+    .logbook-container-4{
+        position: relative;
+        display:flex;
+        width: 80%;
+        height : 600px;
+        align-self: center;
+        left: 100px; 
+        background-color: lime;  
+    }
+
     h3{
         color:black;
     }
@@ -391,8 +468,7 @@
         height: 60%;
         left: 60px;
         top: 50px;
-        z-index:10;
-        
+        z-index:10;  
     }
 
     fieldset legend{
@@ -500,6 +576,56 @@
         color: #E5E7E9;
         background: crimson;
         border: 1px solid #283747;
+    }
+
+    /* CONTAINER VER ENTRADA */
+
+    .logbook-container-4{
+        display:flex;
+        font-family: 'Times New Roman', Times, serif;
+        position: relative;
+        width: 100%;
+        height : 600px;
+        align-self: center;
+        align-content: center;
+        align-items: center;
+        left: 100px; 
+        background-color: white;  
+    }
+
+    .middle-container-4 {
+        position:relative;  
+        border-radius:20px;
+        width: 70%;
+        margin-left: 100px;
+        align-self: center;
+        display:flex;
+        align-items: right;
+        border: 1px solid black;
+        text-align: left;
+        padding : 50px;
+        margin-bottom:150px;
+    }
+
+    .viewEntry h3{
+        position:relative;
+        text-align: left;
+        text-decoration: none;
+        font-weight: none;
+        color: blue;
+        font-size:1.2em;
+    }
+
+    .viewEntryAnswer h3{
+        text-align: justify;
+        margin-left: 10px;
+        font-size: 1.2em;
+    }
+
+
+    .logbook-container-4 .verEntrada{
+        position        : relative;
+        padding-left    : 400px;
     }
 
     .create-radio-buttons{

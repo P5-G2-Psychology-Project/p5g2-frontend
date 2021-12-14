@@ -1,13 +1,26 @@
 <template>
+<div>
     <div class="Home">
         <div class="home-container-1">  
-                <h1> <span id="LogedUser">{{ userFullNameById.name }}</span>, recuerda que el seguimiento de tu proceso te ayudará a progresar y a tomar mejores decisiones</h1>
+                <h1> <span id="LogedUser">{{ UserDetailById.name }}</span>, recuerda que el seguimiento de tu proceso te ayudará a progresar y a tomar mejores decisiones</h1>
         </div>
         <div class="imagehome">
             <img src="../images/calendar.jpg">
         </div>
+
+  
     </div>
-   
+    <hr style="border:15px;color:transparent;">     
+ <hr style="border:15px;color:transparent;">
+ <hr style="border:15px;color:transparent;">     
+ <hr style="border:15px;color:transparent;">
+ <hr style="border:15px;color:transparent;">
+      <section class="footerAbout" >
+        <div>
+            <h2 class="footertext">MisionTic 2022 - P5 - Grupo2 ©</h2>
+            </div>  <!-- End Footer Section -->
+        </section>
+   </div>
 </template>
 
 <script>
@@ -19,9 +32,9 @@
         /*Recuerde que esta función de data se carga antes de todo y por eso pone el username de una*/
         data: function(){
             return {
-                userId           : jwt_decode(localStorage.getItem("tokenRefresh")).user_id,
+                userId           : jwt_decode(localStorage.getItem("tokenRefresh")).user_id ,
                 username         : localStorage.getItem("username"),
-                userFullNameById : {
+                UserDetailById : {
                     name : "",
                 }
             }
@@ -34,7 +47,7 @@
 
         apollo: {
             //Take in account that this MS require authorization to perform this activity.
-            userFullNameById : {
+            UserDetailById : {
                 query : gql`
                     query Query($userId: Int!) {
                     UserDetailById(userId: $userId) {
@@ -57,7 +70,9 @@
 <style>
 
     .Home{
-        height:80%; 
+    height: 260px;
+        
+       
     }
     .home-container-1{
         position: relative;
@@ -72,6 +87,7 @@
         left:100px;
         overflow: hidden;
         z-index:-1;
+       
         
     }
 
@@ -90,7 +106,7 @@
 
     .imagehome{
         position: relative;
-        top:-550px;
+        top:-320px;
         left:300px;
         z-index: -1;
     }

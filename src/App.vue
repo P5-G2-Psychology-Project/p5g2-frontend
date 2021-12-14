@@ -8,7 +8,11 @@
         <div class="crops-menu">
           <button v-if="isAuth" id="home" v-on:click="loadHome"> Home  </button>
           <button v-if="isAuth" v-on:click="loadLogbook"> Mi bitácora  </button>
-          <button v-if="isAuth" v-on:click="loadAddCultivo"> Cuéntanos </button>
+          <button v-if="isAuth" v-on:click="loadCuentanos"> Cuéntanos </button>
+        </div>
+
+        <div class="about-menu">
+          <button  v-if="!isAuth" v-on:click="loadAbout"> ? </button>
         </div>
 
         <div class="auth-menu">
@@ -74,6 +78,10 @@
         this.$router.push({name: "home"})
       },
 
+      loadAbout: function(){
+        this.$router.push({name: "about"})
+      },
+
       loadLogIn: function(){
         this.$router.push({name: "login"})
       },
@@ -84,6 +92,10 @@
 
       loadLogbook: function(){
         this.$router.push({name: "logbook"})
+      },
+
+      loadCuentanos: function(){
+        this.$router.push({name: "pqrs"})
       },
 
       logOut: function(){
@@ -105,17 +117,11 @@
       },
 
       completedLogbook: function(data){
-        console.log("Llegue pleno hasta acá")
+        
       },
-/*
-      completedAddCultivo: function(data){
-        alert("Registro de cultivo exitoso")
-      },
-      */
 
      /*Función que se carga apenas se carga un componente o la app*/
     created : function(){
-      this.verifyAuth()
     }
 
   }
@@ -170,6 +176,25 @@
     font-weight: bold;
     
   }
+
+  .about-menu button{
+    background-color:#37474F;
+    border-radius:5px;
+    padding:5px;
+    border-width: 1px;
+    font-weight: bold;
+    border-width: 1.5px;
+    margin-right:5px;
+    top:20px;
+    left:7%;
+    height: 35px;
+    width:35px;   
+    position: absolute;
+  }
+  .about-menu button:hover{
+    border: 2px solid white;
+  }
+
   .auth-menu button{
     background-color:#37474F;
     border-radius:5px;

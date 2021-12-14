@@ -8,8 +8,20 @@ import Login                                            from './components/login
 import SignUp                                           from './components/signUp.vue'
 import Home                                             from './components/home.vue'
 import Logbook                                          from './components/logbook.vue'
+import About                                            from './components/about.vue'
+import Pqrs                                             from './components/pqrs.vue'
+                                            
 
 const routes = [
+
+  {
+    path: '/about',
+    name: "about",
+    component: About,
+    meta      : {
+      requiresAuth: false,
+    }
+  },
   {
     path        : '/user/login',
     name        : "login",
@@ -41,7 +53,15 @@ const routes = [
     meta      : {
       requiresAuth: true,
     }
-  }
+  },
+  {
+    path: '/cuentanos',
+    name: "pqrs",
+    component: Pqrs,
+    meta      : {
+      requiresAuth: true,
+    }
+  },
   
 ];
 
@@ -101,7 +121,7 @@ router.beforeEach(async (to,from) => {
     return { name : "home" };
   }
   else{
-    return { name : "login" }; 
+    return { name : "about" }; //En vez de login que me cargue about
   }
 });
 
