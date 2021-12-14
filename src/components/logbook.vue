@@ -133,7 +133,7 @@
                 },
 
                 updateTicket            : {
-                    id              : 5,
+                    id              : this.rowSelected,
                     logbook         : localStorage.getItem("username"),
                     date            : "",
                     physichologist  : "",
@@ -159,11 +159,42 @@
                 this.rowSelected = id;
                 console.log(id)
                 alert(this.rowSelected)
-                document.getElementById('row-selected').value = this.rowSelected;
             },
 
             processCreateEntry: async function(){
                 this.entryTicket.attendance = !!parseInt(this.entryTicket.attendance);
+
+                if(localStorage.getItem("tokenRefresh") === null || localStorage.getItem('tokenAccess') === null){
+                    this.$emit("logOut");
+                    return;
+                }
+                localStorage.setItem("tokenAcess", "");
+
+                await this.$apollo.mutate(
+                    {
+                        mutation: gql`
+                            mutation Mutation($token: Refresh!) {
+                              refreshToken(token: $token) {
+                                access
+                              }
+                            }
+                        `,
+                        variables:{
+                            token: {
+                                refresh: localStorage.getItem("tokenRefresh"),
+                            }
+                        }
+                    }
+                )
+                .then((result) => {
+                    localStorage.setItem("tokenAcess", result.data.refreshToken.access);
+                })
+                .catch((error) => {
+                    this.$emit("logOut");
+                    return;
+                })
+
+
                 console.log(this.entryTicket)
                 await this.$apollo.mutate(
                     {
@@ -187,13 +218,78 @@
                     alert("Ha ocurrido un error")
                 })
 
-            }
             },
 
-        
-     
-        
-        
+            processUpdateEntry: async function(){
+                this.entryTicket.attendance = !!parseInt(this.entryTicket.attendance);
+                if(this.rowSelected != 0)
+                {
+                    if(localStorage.getItem("tokenRefresh") === null || localStorage.getItem('tokenAccess') === null){
+                        this.$emit("logOut");
+                        return;
+                    }
+                    localStorage.setItem("tokenAcess", "");
+
+                    await this.$apollo.mutate(
+                        {
+                            mutation: gql`
+                                mutation Mutation($token: Refresh!) {
+                                refreshToken(token: $token) {
+                                    access
+                                }
+                                }
+                            `,
+                            variables:{
+                                token: {
+                                    refresh: localStorage.getItem("tokenRefresh"),
+                                }
+                            }
+                        }
+                    )
+                    .then((result) => {
+                        localStorage.setItem("tokenAcess", result.data.refreshToken.access);
+                    })
+                    .catch((error) => {
+                        this.$emit("logOut");
+                        return;
+                    })
+
+
+                    await this.$apollo.mutate(
+                        {
+                            mutation: gql`
+                                mutation ($entryUpdateBody: EntryUpdateInput!) {
+                                entryUpdate(entryUpdateBody: $entryUpdateBody) {
+                                    id
+                                    bitacora
+                                    fecha
+                                    psicologo
+                                    asistencia
+                                    descripcion
+                                    satisfaccion
+                                }
+                                }
+                            `,
+                            variables : {
+                                entryUpdateBody: this.updateTicket,
+                            }
+                        }
+                    )
+                    .then((result) => {
+                        let message = "La entrada ha sido actualizada exitosamente";
+                        alert(message);
+                    })
+                    .catch((error) => {
+                        console.log(error)
+                        alert("Ha ocurrido un error actualizando la entrada")
+                    })
+                }
+                else{
+                    alert("Debe seleccionar alguna entrada");
+                }
+            }
+
+        },
 
         apollo: {
             entriesDetailByUsername : {

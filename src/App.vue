@@ -39,6 +39,7 @@
         v-on:completedLogIn="completedLogIn" 
         v-on:completedSignUp="completedSignUp"
         v-on:completedLogbook="completedLogbook"
+        v-on:logOut="logOut"
 
 
       >
@@ -57,25 +58,18 @@
   export default{
     name : 'App',
 
-    data: function(){
-      return {
-        isAuth: false
+    computed:{
+      isAuth: {
+        get: function(){
+          return this.$route.meta.requiresAuth;
+        },
+        set: function(){
+
+        }
       }
-    },
-    components:{
-    },
+    }, 
     
     methods : {
-      verifyAuth: function(){
-        this.isAuth = localStorage.getItem("isAuth") || false;
-        if(this.isAuth == false){
-          this.$router.push({name: "login"})
-        }
-        else{
-          this.$router.push({name:"home"})
-        }
-      },
-
       loadHome: function(){
         this.$router.push({name: "home"})
       },
@@ -94,17 +88,16 @@
 
       logOut: function(){
         localStorage.clear();
-        this.isAuth = false;
         alert('Sesión terminada')
-        this.verifyAuth();
+        this.loadLogIn();
       },
 
       completedLogIn: function(data){
         localStorage.setItem('username', data.username);
         localStorage.setItem('tokenRefresh', data.tokenRefresh);
         localStorage.setItem('tokenAccess', data.tokenAccess);
-        localStorage.setItem('isAuth', true);
-        this.verifyAuth();
+        alert("Autenticación exitosa")
+        this.loadHome();
       },
       completedSignUp: function(data){
         alert("Registro exitoso");

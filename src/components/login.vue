@@ -55,13 +55,12 @@
                     }
                 )
                 .then((result) => {
-                    console.log(result)
                     let dataLogIn = {
                         username     : this.user.username,
                         tokenRefresh : result.data.LogIn.refresh,
                         tokenAccess  : result.data.LogIn.access 
                     }
-
+                    console.log(dataLogIn)
                     this.$emit("completedLogIn", dataLogIn);
 
                 })
