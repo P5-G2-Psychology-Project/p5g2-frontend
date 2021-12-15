@@ -10,10 +10,8 @@ import Home                                             from './components/home.
 import Logbook                                          from './components/logbook.vue'
 import About                                            from './components/about.vue'
 import Pqrs                                             from './components/pqrs.vue'
-                                            
 
 const routes = [
-
   {
     path: '/about',
     name: "about",

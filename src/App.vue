@@ -18,7 +18,8 @@
         <div class="auth-menu">
           <button  v-if="!isAuth" v-on:click="loadLogIn">    Iniciar Sesión  </button>
           <button  v-if="!isAuth" v-on:click="loadSignUp">   Registrarse     </button>
-          <button  v-if="isAuth"  v-on:click="logOut">      Cerrar Sesión   </button>
+          <button  v-if="isAuth" v-on:click="logOut">   Cerrar Sesión     </button>
+
       
       
         </div>
@@ -52,8 +53,8 @@
       
     </div>
 
-    
-    
+   
+
   </div>
   
 </template>
@@ -61,7 +62,9 @@
 <script>
   export default{
     name : 'App',
-
+ 
+     
+    
     computed:{
       isAuth: {
         get: function(){
@@ -120,13 +123,21 @@
         
       },
 
+
+ 
+
      /*Función que se carga apenas se carga un componente o la app*/
     created : function(){
+
+      
     }
 
   }
   }
   
+
+
+
 </script>
 
 
@@ -300,4 +311,12 @@ top:28%;
   justify-content: center;
   align-items: center;
 }
+
+
+
+
+
+
+
+
 </style>

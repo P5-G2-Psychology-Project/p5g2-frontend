@@ -1,6 +1,8 @@
 <template>
     <div>
-        
+        <div class="scroll-to-top">
+                <button @click="scrollToTop"> Subir </button>
+         </div>
             <!-- ======= Hero Section ======= -->
         <section id="hero" class="d-flex align-items-center">
 
@@ -126,10 +128,29 @@
         </section>
 
     </div>
+
 </template>
 
 <script>
-    
+export default{
+methods:{
+scrollToTop(){
+                let currentScroll = document.documentElement.scrollTop,
+                  int = setInterval(frame, 6)
+
+                  function frame(){
+                      if( 0 > currentScroll)
+                          clearInterval(int)
+
+                      else {
+                          currentScroll = currentScroll - 12
+                          document.documentElement.scrollTop = currentScroll
+
+                      }
+                  }
+            },
+}
+}
 </script>
 
 <style>
@@ -174,5 +195,32 @@
 .footerAbout .footertext{
 color:white;    
 }
+
+
+.scroll-to-top {
+     
+      
+   right: 0;
+   
+   z-index:100000;
+ }
+ .scroll-to-top button {
+   border: none;
+   background: #5162ce;
+   position: fixed;
+   right:10px;
+   top:540px;
+   cursor: pointer;
+   z-index:1000000;
+   border-radius:100px;
+ }
+ .scroll-to-top :hover{
+    background: #333e88;
+ }
+
+
+
+
+
 </style>
 

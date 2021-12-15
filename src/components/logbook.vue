@@ -1,5 +1,8 @@
 <template>
     <div class="Logbook">
+         <div class="scroll-to-top">
+                <button @click="scrollToTop"> Subir </button>
+         </div>
         <div class="logbook-container-1" >  
            
             <div class="menu-logbook">
@@ -19,6 +22,7 @@
                 <table class="table table-bordered table-hover" id="tableLogbook">
                     <thead>
                     <tr>
+                        <th scope="col" style ="width:3%">  #</th>
                         <th scope="col" style ="width:5%">  Fecha</th>
                         <th scope="col" style ="width:15%"> Profesional</th>
                         <th scope="col" style ="width:10%"> Asistencia</th>
@@ -28,6 +32,7 @@
                     </thead>
                     <tbody>
                         <tr height="10px" v-for="entry in entriesDetailByUsername" :key="entry" v-on:click="selectRow(entry)" class="hideextra">
+                            <td>{{entry.id}}</td>
                             <td>{{entry.fecha}}</td>
                             <td>{{entry.psicologo}}</td>
                             <td>{{entry.asistencia}}</td>
@@ -132,6 +137,7 @@
 <div class="footer">
       <h2>MisionTic 2022 - P5 - Grupo2 ©</h2>
     </div>
+    
     </div>
 </template>
 
@@ -178,6 +184,24 @@
         },
 
         methods: {
+
+            scrollToTop(){
+                let currentScroll = document.documentElement.scrollTop,
+                  int = setInterval(frame, 6)
+
+                  function frame(){
+                      if( 0 > currentScroll)
+                          clearInterval(int)
+
+                      else {
+                          currentScroll = currentScroll - 12
+                          document.documentElement.scrollTop = currentScroll
+
+                      }
+                  }
+            },
+
+
             scrollMeTo(refName) {
                 var element = this.$refs[refName];
                 var top = element.offsetTop;
@@ -380,8 +404,14 @@
         created: function(){
             this.$apollo.queries.entriesDetailByUsername
             this.$apollo.queries.entriesDetailByUsername.refetch()
-        }
-    }   
+        },
+      
+
+
+   
+      }
+
+    
 </script>
 
 <style>
@@ -557,6 +587,7 @@
         border-radius: 5px;
         margin-bottom:15px;
     }
+    
     .logbook-container-2 button:hover{
         color: #E5E7E9;
         background: crimson;
@@ -652,4 +683,24 @@
         background-color: #ddd;
     }
 
-</style>
+    .scroll-to-top {    
+      right: 0;    
+      z-index:100000;
+    }
+
+    .scroll-to-top button {
+      border: none;
+      background: #5162ce;
+      position: fixed;
+      right:10px;
+      top:540px;
+      cursor: pointer;
+      z-index:1000000;
+      border-radius:100px;
+    }
+    .scroll-to-top :hover{
+       background: #333e88;
+    }
+
+
+</style>    

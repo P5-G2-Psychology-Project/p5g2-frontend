@@ -1,20 +1,24 @@
 <template>
     <div class="pqrs">
+        <div class="scroll-to-top">
+                <button @click="scrollToTop"> Subir </button>
+         </div>
+
         <div class="logbook-container-2" ref="crearEntrada">
             <fieldset>
-                <legend>Cuéntanos</legend>
-                <form class="formCreateEntry" v-on:submit.prevent="processCreateEntry">
-                    <input type="text" v-model="cuentanos.physichologist" placeholder="Email">
+                <legend>Cuéntanos, {{UserDetailById.name}}</legend>
+                <form class="formCreateEntry" v-on:submit.prevent="processCreateCuentanos">
+                    <input type="email" v-model="cuentanos.email" placeholder="Email">
                     <br/>
-                    <input type="text" v-model="cuentanos.ventajas" placeholder="Ventaja">
+                    <input type="text" v-model="cuentanos.ventajas" placeholder="¿Ventajas de la plataforma?">
                     <br/>
-                    <input type="text" v-model="cuentanos.terapias" placeholder="Terapias">
+                    <input type="text" v-model="cuentanos.terapias" placeholder="¿A qué terapias asistes?">
                     <br/>
-                    <input type="text" v-model="cuentanos.negativo" placeholder="Negativo">
+                    <input type="text" v-model="cuentanos.negativo" placeholder="¿Has tenido inconvenientes?">
                     <br/>
-                    <input type="text" v-model="cuentanos.sugerencia" placeholder="Sugerencias">
+                    <input type="text" v-model="cuentanos.sugerencia" placeholder="¿Recomiendas ir a terapia?">
                     <br/>
-                    <button type="submit">Crear</button>
+                    <button type="submit">Enviar</button>
                 </form>
 
             </fieldset>
@@ -24,14 +28,30 @@
             </div>   
         </div>
 
+        <!-- ======== Detail view Section ========== -->
+        <div class="logbook-container-4" ref="verEntrada">
+            <div class="middle-container-4">
+                <div class="viewEntry">
+                    <h3 >Fecha :               {{}}   </h3>
+                    <h3 >Ventajas plataforma: {{}}   </h3>
+                    <h3>Terapias :             {{}}   </h3>
+                    <h3>Inconvenientes :       {{}}   </h3>
+                    <h3>Recomendaciones :      {{}}   </h3>
+                </div> 
+                <div class="viewEntryAnswer">
+                    <h3>{{this.pqrsDetail.fecha}}</h3>
+                    <h3>{{this.pqrsDetail.ventajas}}</h3>
+                    <h3>{{this.pqrsDetail.negativo}}</h3>
+                    <h3>{{this.pqrsDetail.terapias}}</h3>
+                    <h3>{{this.pqrsDetail.sugerencia}}</h3>                   
+                </div>
+            </div>            
+        </div>
+
          <!-- ======= Contact Section ======= -->
             <section id="contact" class="contact section-bg">
             <div class="container" data-aos="fade-up">
-
                 <div class="section-title">
-                
-             
-
                 </div>
 
                 <div class="row">
@@ -99,25 +119,112 @@
             return {
                 userId           : jwt_decode(localStorage.getItem("tokenRefresh")).user_id ,
                 username         : localStorage.getItem("username"),
+                UserDetailById : {
+                    name : "",
+                },
                 cuentanos : {
                     nombre          : localStorage.getItem("username"),
-                    fecha           : "",
+                    fecha           : (new Date()).toJSON().toString().substring(0,10),
                     email           : "",
                     ventajas        : "",
                     terapias        : "",
                     negativo        : "",
                     sugerencia      : "",
+                },
+                pqrsDetail :  {
+                    fecha       : "",
+                    ventajas    : "",
+                    negativo    : "",
+                    terapias    : "",
+                    sugerencia  : ""
                 }
             }
             
         },
 
-        components:{
+        methods:{
+            scrollToTop(){
+                    let currentScroll = document.documentElement.scrollTop,
+                      int = setInterval(frame, 6)
 
+                      function frame(){
+                          if( 0 > currentScroll)
+                              clearInterval(int)
+
+                          else {
+                              currentScroll = currentScroll - 12
+                              document.documentElement.scrollTop = currentScroll
+
+                          }
+                      }
+                },
+
+            processCreateCuentanos: async function(){
+                if(localStorage.getItem("tokenRefresh") === null || localStorage.getItem('tokenAccess') === null){
+                    this.$emit("logOut");
+                    return;
+                }
+                localStorage.setItem("tokenAcess", "");
+
+                await this.$apollo.mutate(
+                    {
+                        mutation: gql`
+                            mutation Mutation($token: Refresh!) {
+                              refreshToken(token: $token) {
+                                access
+                              }
+                            }
+                        `,
+                        variables:{
+                            token: {
+                                refresh: localStorage.getItem("tokenRefresh"),
+                            }
+                        }
+                    }
+                )
+                .then((result) => {
+                    localStorage.setItem("tokenAcess", result.data.refreshToken.access);
+                })
+                .catch((error) => {
+                    this.$emit("logOut");
+                    return;
+                })
+
+                await this.$apollo.mutate(
+                    {
+                        mutation: gql`
+                            mutation Mutation($pqrsInput: PqrsCreate!) {
+                              pqrsCreate(PqrsInput: $pqrsInput) {
+                                nombre
+                                fecha
+                                email
+                                ventajas
+                                negativo
+                                terapias
+                                sugerencia
+                              }
+                            }
+                         `,
+                        variables : {
+                            pqrsInput: this.cuentanos,
+                        }
+
+                    }
+                )
+                .then((result) => {
+                    let message = "Tu opinión ha sido enviada. ¡Muchas gracias!";
+                    alert(message);
+                })
+                .catch((error) => {
+                    console.log(this.cuentanos)
+                    console.log(error)
+                    alert("Ha ocurrido un error enviando tu opinión")
+                })                
+
+            }
         },
 
         apollo: {
-            //Take in account that this MS require authorization to perform this activity.
             UserDetailById : {
                 query : gql`
                     query Query($userId: Int!) {
@@ -132,7 +239,28 @@
                         userId : this.userId,
                     }
                 }
-            }
+            },
+
+            pqrsDetail : {
+                query :gql `
+                    query PqrsDetail($username: String!) {
+                      pqrsDetail(username: $username) {
+                        fecha
+                        ventajas
+                        negativo
+                        terapias
+                        sugerencia
+                      }
+                    }
+                `,
+                variables(){
+                    return {
+                        username : localStorage.getItem("username"),
+                    }
+                }
+
+            },
+
         }
 
     }
@@ -190,6 +318,54 @@
         top: 20px;
     }
 
+    .logbook-container-4{
+        display:flex;
+        font-family: 'Times New Roman', Times, serif;
+        position: relative;
+        width: 100%;
+        height : 600px;
+        align-self: center;
+        align-content: center;
+        align-items: center;
+        left: 100px; 
+        background-color: white;  
+    }
+
+    .middle-container-4 {
+        position:relative;  
+        border-radius:20px;
+        width: 75%;
+        margin-left: 100px;
+        align-self: center;
+        display:flex;
+        align-items: right;
+        border: 1px solid black;
+        text-align: left;
+        padding : 50px;
+        margin-bottom:150px;
+    }
+
+    .viewEntry h3{
+        position:relative;
+        text-align: left;
+        text-decoration: none;
+        font-weight: none;
+        color: blue;
+        font-size:1.2em;
+    }
+
+    .viewEntryAnswer h3{
+        text-align: justify;
+        margin-left: 10px;
+        font-size: 1.2em;
+    }
+
+
+    .logbook-container-4 .verEntrada{
+        position        : relative;
+        padding-left    : 400px;
+    }
+
 /*--------------------------------------------------------------
 # Contact
 --------------------------------------------------------------*/
@@ -217,5 +393,29 @@
   font-size: 14px;
   margin-bottom: 0;
 }
+
+
+
+.scroll-to-top {
+     
+      
+  right: 0;
+  
+  z-index:100000;
+}
+.scroll-to-top button {
+  border: none;
+  background: #5162ce;
+  position: fixed;
+  right:10px;
+  top:540px;
+  cursor: pointer;
+  z-index:1000000;
+  border-radius:100px;
+}
+.scroll-to-top :hover{
+   background: #333e88;
+}
+
 
 </style>
