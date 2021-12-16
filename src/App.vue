@@ -16,6 +16,7 @@
         </div>
 
         <div class="auth-menu">
+          <button  v-if="!isAuth" v-on:click="loadExperiences">   Experiences   </button>
           <button  v-if="!isAuth" v-on:click="loadLogIn">    Iniciar Sesión  </button>
           <button  v-if="!isAuth" v-on:click="loadSignUp">   Registrarse     </button>
           <button  v-if="isAuth" v-on:click="logOut">   Cerrar Sesión     </button>
@@ -99,6 +100,10 @@
 
       loadCuentanos: function(){
         this.$router.push({name: "pqrs"})
+      },
+
+      loadExperiences: function(){
+        this.$router.push({name:"experiences"})
       },
 
       logOut: function(){

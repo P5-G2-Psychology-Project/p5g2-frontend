@@ -45,11 +45,15 @@
                     <h3>{{this.pqrsDetail.terapias}}</h3>
                     <h3>{{this.pqrsDetail.sugerencia}}</h3>                   
                 </div>
-            </div>            
+            </div>           
+            <button class="delete-pqrs" v-on:click="processDeleteCuetanos()">Eliminar</button>
         </div>
 
+
+
+
          <!-- ======= Contact Section ======= -->
-            <section id="contact" class="contact section-bg">
+        <section id="contact" class="contact section-bg">
             <div class="container" data-aos="fade-up">
                 <div class="section-title">
                 </div>
@@ -62,22 +66,22 @@
                     <div class="col-md-12">
                         <div class="info-box">
                         <i class="bx bx-map"></i>
-                        <h3>Our Address</h3>
-                        <p>A108 Adam Street, New York, NY 535022</p>
+                        <h3>Nuestra ubicación</h3>
+                        <p>Bogotá, Colombia</p>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="info-box mt-4">
                         <i class="bx bx-envelope"></i>
-                        <h3>Email Us</h3>
-                        <p>info@example.com<br>contact@example.com</p>
+                        <h3>Escribenos</h3>
+                        <p>we@gmail.com<br>weadmin@gmail.com</p>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="info-box mt-4">
                         <i class="bx bx-phone-call"></i>
-                        <h3>Call Us</h3>
-                        <p>+1 5589 55488 55<br>+1 6678 254445 41</p>
+                        <h3>Llamanos</h3>
+                        <p>+57 3213333333<br>+57 3213222223</p>
                         </div>
                     </div>
                     </div>
@@ -220,8 +224,31 @@
                     console.log(error)
                     alert("Ha ocurrido un error enviando tu opinión")
                 })                
+            },
 
-            }
+            processDeleteCuetanos: async function(){
+                await this.$apollo.mutate(
+                        {
+                        mutation: gql `
+                            mutation Mutation($username: String!) {
+                              pqrsDelete(username: $username)
+                            }      
+                        `,
+                        variables : {
+                            username : localStorage.getItem("username")
+                        }
+                    }
+                )
+                .then((result) => {
+                    console.log(result)
+                    let message = "Tu comentario ha sido eliminado exitosamente";
+                    alert(message);
+                })
+                .catch((error) => {
+                    console.log(error)
+                    alert("Ha ocurrido un error eliminando tu comentario. \n Intenta de nuevo")
+                })
+            },
         },
 
         apollo: {
@@ -339,10 +366,12 @@
         align-self: center;
         display:flex;
         align-items: right;
-        border: 1px solid black;
         text-align: left;
         padding : 50px;
         margin-bottom:150px;
+        box-shadow: 0px 0px 16px rgba(0,0,0,0.6);
+        background-image: linear-gradient(to bottom right, #2C3E50, #4CA1AF);
+        border: 0px solid black;
     }
 
     .viewEntry h3{
@@ -350,7 +379,7 @@
         text-align: left;
         text-decoration: none;
         font-weight: none;
-        color: blue;
+        color: white;
         font-size:1.2em;
     }
 
@@ -415,6 +444,24 @@
 }
 .scroll-to-top :hover{
    background: #333e88;
+}
+
+.delete-pqrs{
+    position: absolute;
+    bottom: 190px;
+    right: 200px;
+    background-color: red;
+    border: 0.5px solid rgb(255, 255, 255);
+    height:35px;
+    border-radius: 5px;
+    padding:10px;
+    margin-right: 20px;
+    padding-bottom: 30px;
+}
+
+.delete-pqrs:hover{
+    border: 2px solid white;
+    background-color: orange;
 }
 
 

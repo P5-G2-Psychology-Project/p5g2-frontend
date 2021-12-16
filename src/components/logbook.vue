@@ -216,7 +216,6 @@
                 this.detailTicket.asistencia    = entryRow.asistencia;
                 this.detailTicket.descripcion   = entryRow.descripcion;
                 this.detailTicket.satisfaccion  = entryRow.satisfaccion;
-                alert(this.rowSelected)
             },
 
             processCreateEntry: async function(){
@@ -681,6 +680,10 @@
 
     table tr:not(:first-child):hover{
         background-color: #ddd;
+    }
+
+    ul{
+        list-style-type: none;
     }
 
     .scroll-to-top {    

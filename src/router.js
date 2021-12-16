@@ -10,8 +10,18 @@ import Home                                             from './components/home.
 import Logbook                                          from './components/logbook.vue'
 import About                                            from './components/about.vue'
 import Pqrs                                             from './components/pqrs.vue'
+import Experiences                                      from './components/experiences.vue'
+
 
 const routes = [
+  {
+    path: '/experiences',
+    name: "experiences",
+    component: Experiences,
+    meta      : {
+      requiresAuth: false,
+    }
+  },
   {
     path: '/about',
     name: "about",
